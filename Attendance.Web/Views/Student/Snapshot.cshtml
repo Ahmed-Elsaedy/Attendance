@@ -1,0 +1,27 @@
+﻿@model string;
+
+@{
+    ViewData["Title"] = "Camera";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h1>Snaphot</h1>
+
+<form action="SnapshotConfirm" method="post">
+    <div class="d-flex flex-column min-vh-50 justify-content-center align-items-center">
+        <div class="card text-center">
+            <div class="card-header">
+                Please confirm snapshot
+            </div>
+            <div class="card-body">
+                <img src="@ViewData["ImageSrc"].ToString()" />
+                <input type="hidden" name="image" id="inputImage" value="@ViewData["ImageSrc"].ToString()" />
+                <input type="hidden" name="code" value="@ViewData["Code"].ToString()" />
+            </div>
+            <div class="card-footer">
+                <a type="button" asp-action='Camera' asp-route-code="@ViewData["Encoded"].ToString()" class="btn btn-secondary mx-1">Try again</a>
+                <button type="submit" class="btn btn-primary mx-1">Confirm</button>
+            </div>
+        </div>
+    </div>
+</form>

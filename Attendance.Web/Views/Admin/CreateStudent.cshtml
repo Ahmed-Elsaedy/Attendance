@@ -1,0 +1,141 @@
+﻿@model Attendance.Web.DTOs.Students.CreateStudentDto
+
+@{
+    ViewData["Title"] = "Create";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+
+    string code = string.IsNullOrEmpty(Model?.Code) ? Guid.NewGuid().ToString() : Model.Code;
+}
+
+<h1>Create</h1>
+
+<h4>Student</h4>
+<hr />
+<form asp-action="CreateStudent" enctype="multipart/form-data">
+    <div class="row">
+        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+    </div>
+
+    <div class="row">
+        <div class="col-4">
+            <div class="form-group">
+                <label asp-for="Code" class="control-label"></label>
+                <input asp-for="Code" class="form-control" value="@code" readonly />
+                <span asp-validation-for="Code" class="text-danger"></span>
+            </div>
+        </div>
+        <div class="col-4">
+            <div class="form-group">
+                <label asp-for="Firstname" class="control-label"></label>
+                <input asp-for="Firstname" class="form-control" />
+                <span asp-validation-for="Firstname" class="text-danger"></span>
+            </div>
+        </div>
+        <div class="col-4">
+            <div class="form-group">
+                <label asp-for="Lastname" class="control-label"></label>
+                <input asp-for="Lastname" class="form-control" />
+                <span asp-validation-for="Lastname" class="text-danger"></span>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-4">
+            <div class="form-group">
+                <label asp-for="Birthdate" class="control-label"></label>
+                <input asp-for="Birthdate" class="form-control" />
+                <span asp-validation-for="Birthdate" class="text-danger"></span>
+            </div>
+
+        </div>
+        <div class="col-4">
+            <div class="form-group">
+                <label asp-for="PhoneNumber" class="control-label"></label>
+                <input asp-for="PhoneNumber" class="form-control" type="number" />
+                <span asp-validation-for="PhoneNumber" class="text-danger"></span>
+            </div>
+        </div>
+        <div class="col-4">
+            <div class="form-group">
+                <label asp-for="GradeId" class="control-label"></label>
+                <select asp-for="GradeId" class="form-control" asp-items="ViewBag.GradeId"></select>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-4">
+            <div class="form-group">
+                <label asp-for="DepartmentId" class="control-label"></label>
+                <select asp-for="DepartmentId" class="form-control" asp-items="ViewBag.DepartmentId"></select>
+            </div>
+        </div>
+        <div class="col-4">
+            <div class="mb-3">
+                <label asp-for="ProfileImage" class="form-label"></label>
+                <input asp-for="ProfileImage" class="form-control form-control-sm" type="file">
+                <span asp-validation-for="ProfileImage" class="text-danger"></span>
+            </div>
+        </div>
+        <div class="col-4">
+        </div>
+    </div>
+    <div class="row">
+        <div class="col">
+            <table class="table table-bordered table-sm">
+                <caption>
+                    <div class="input-group mb-3">
+                        <span class="input-group-text" id="basic-addon1">Total Count</span>
+                        <input asp-for="ImagesCount" type="number" class="form-control" value="0" readonly>
+                    </div>
+                    <span asp-validation-for="ImagesCount" class="text-danger"></span>
+                </caption>
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Images</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @for (var i = 0; i < 5; i++)
+                    {
+                        <tr>
+                            <td>@string.Format("Image {0}",i + 1)</td>
+                            <td>
+                                <input asp-for="Images" class="form-control form-control-sm" type="file">
+                                <span asp-validation-for="Images" class="text-danger"></span>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col">
+            <div class="form-group">
+                <input type="submit" value="Create" class="btn btn-primary" />
+            </div>
+        </div>
+    </div>
+</form>
+
+<div>
+    <a asp-action="StudentsList">Back to List</a>
+</div>
+
+@section Scripts {
+<script>
+    $('table input[type=file]').change(()=>{
+     var countNotEmpty = $('table input[type=file]').filter(function() { return $(this).val() }).length;
+     $('table caption input').val(countNotEmpty);
+    });
+
+
+
+</script>
+
+@{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

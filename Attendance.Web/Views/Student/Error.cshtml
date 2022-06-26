@@ -1,0 +1,105 @@
+﻿@using Attendance.Web.DTOs
+@model SessionAttendanceCodeValidationEnum
+
+@{
+    ViewData["Title"] = "Error";
+
+    Layout = "~/Views/Shared/_StudentLayout.cshtml";
+    Boolean isError = false;
+    string message = "";
+    switch (Model)
+    {
+        case SessionAttendanceCodeValidationEnum.Success:
+            isError = false;
+            message = "Attendance has been sent successfully";
+            break;
+        case SessionAttendanceCodeValidationEnum.InvalidCode:
+            isError = true;
+            message = "Invalid session QR code";
+            break;
+        case SessionAttendanceCodeValidationEnum.ExpiredCode:
+            isError = true;
+            message = "QR code is expired";
+            break;
+        case SessionAttendanceCodeValidationEnum.SessionNotFound:
+            message = "Session could not be found";
+            isError = true;
+            break;
+        case SessionAttendanceCodeValidationEnum.SessionEnded:
+            message = "Session has beed ended";
+            isError = true;
+            break;
+        case SessionAttendanceCodeValidationEnum.SessionNotStartedYet:
+            message = "Session has not been started yet";
+            isError = true;
+            break;
+        case SessionAttendanceCodeValidationEnum.UnProcessable:
+            message = "An error has occured, please try again";
+            isError = true;
+            break;
+        case SessionAttendanceCodeValidationEnum.MultipleFacesDetected:
+            message = "Only one face should be present in the snapshot";
+            isError = true;
+            break;
+        case SessionAttendanceCodeValidationEnum.NoFacesDetected:
+            message = "No faces have been detected in the snapshot";
+            isError = true;
+            break;
+        case SessionAttendanceCodeValidationEnum.UnRecognizedPerson:
+            message = "Unable to recognize the person present in the snapshot";
+            isError = true;
+            break;
+        case SessionAttendanceCodeValidationEnum.StudentDataCouldNotBeFound:
+            message = "Student data could not be found";
+            isError = true;
+            break;
+        case SessionAttendanceCodeValidationEnum.AlreadyRegisteredForThisSession:
+            message = "Attendance already exists";
+            isError = true;
+            break;
+    }
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/error.css" asp-append-version="true" />
+}
+
+    <div class="container">
+        <div class="d-flex flex-column mt-5 min-vh-50 justify-content-center align-items-center">
+            <div class="card text-center">
+                <div class="card-header">
+                @if (isError)
+                {
+                    <h5 class="card-title">Error</h5>
+                }
+                else
+                {
+                    <h5 class="card-title">Success</h5>
+                }
+            </div>
+            <div class="card-body" style="min-width: 200px">
+                @if (isError)
+                {
+                    <div class="swal2-icon swal2-error swal2-animate-error-icon" style="display: flex;"><span class="swal2-x-mark"><span class="swal2-x-mark-line-left"></span><span class="swal2-x-mark-line-right"></span></span></div>
+                }
+                else
+                {
+                    <div class="swal2-icon swal2-success swal2-animate-success-icon" style="display: flex;">
+                        <div class="swal2-success-circular-line-left" style="background-color: rgb(255, 255, 255);"></div>
+                        <span class="swal2-success-line-tip"></span>
+                        <span class="swal2-success-line-long"></span>
+                        <div class="swal2-success-ring"></div>
+                        <div class="swal2-success-fix" style="background-color: rgb(255, 255, 255);"></div>
+                        <div class="swal2-success-circular-line-right" style="background-color: rgb(255, 255, 255);"></div>
+                    </div>
+                }
+            </div>
+            <div class="card-footer">
+                <p>
+                    <h5>@message</h5>
+                </p>
+            </div>
+        </div>
+
+    </div>
+</div>

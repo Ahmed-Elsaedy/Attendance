@@ -1,0 +1,177 @@
+﻿@using Attendance.Web.Data.Entities
+@model Attendance.Web.Data.Entities.Session
+
+@{
+    ViewData["Title"] = "Details";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+
+    var studentSessions = (List<StudentSession>)ViewBag.StudentSessions;
+}
+
+<h1>Details</h1>
+
+<div>
+    <h4>Session</h4>
+    <hr />
+    <nav>
+        <div class="nav nav-tabs" id="nav-tab" role="tablist">
+            <a class="nav-link active" id="nav-home-tab" data-bs-toggle="tab" data-bs-target="#nav-details" type="button" role="tab">
+                Details
+            </a>
+            <a class="nav-link" id="nav-profile-tab" data-bs-toggle="tab" data-bs-target="#nav-students" type="button" role="tab">
+                @String.Format("Students ({0})", studentSessions.Count)
+            </a>
+        </div>
+    </nav>
+    <br />
+    <div class="tab-content" id="nav-tabContent">
+        <div class="tab-pane fade show active" id="nav-details" role="tabpanel">
+            <input type="hidden" id='codeInput' value="@Model.Code" />
+            <dl class="row">
+                <dt class="col-sm-2">
+                    @Html.DisplayNameFor(model => model.Instructor)
+                </dt>
+                <dd class="col-sm-10">
+                    @Html.DisplayFor(model => model.Instructor.DisplayName)
+                </dd>
+                <dt class="col-sm-2">
+                    @Html.DisplayNameFor(model => model.CourseName)
+                </dt>
+                <dd class="col-sm-10">
+                    @Html.DisplayFor(model => model.CourseName)
+                </dd>
+                <dt class="col-sm-2">
+                    @Html.DisplayNameFor(model => model.Subject)
+                </dt>
+                <dd class="col-sm-10">
+                    @Html.DisplayFor(model => model.Subject)
+                </dd>
+                <dt class="col-sm-2">
+                    @Html.DisplayNameFor(model => model.DateFrom)
+                </dt>
+                <dd class="col-sm-10">
+                    @Html.DisplayFor(model => model.DateFrom)
+                </dd>
+                <dt class="col-sm-2">
+                    @Html.DisplayNameFor(model => model.DateTo)
+                </dt>
+                <dd class="col-sm-10">
+                    @Html.DisplayFor(model => model.DateTo)
+                </dd>
+                <dt class="col-sm-2">
+                    @Html.DisplayNameFor(model => model.Code)
+                </dt>
+                <dd class="col-sm-10">
+                    <div id="qrcode"></div>
+                </dd>
+            </dl>
+            <br />
+            <div>
+                <a asp-action="Edit" asp-route-id="@Model?.Id">Edit</a> |
+                <a asp-action="Index">Back to List</a>
+            </div>
+        </div>
+        <div class="tab-pane fade" id="nav-students" role="tabpanel" aria-labelledby="nav-contact-tab">
+            <table class="table table-bordered table-sm students-index">
+                <thead>
+                    <tr>
+                        <th>
+                            Image
+                        </th>
+                        <th>
+                            @Html.DisplayNameFor(model => studentSessions.FirstOrDefault().Student.Code)
+                        </th>
+                        <th>
+                            @Html.DisplayNameFor(model => studentSessions.FirstOrDefault().Student.Firstname)
+                        </th>
+                        <th>
+                            @Html.DisplayNameFor(model => studentSessions.FirstOrDefault().Student.Lastname)
+                        </th>
+                        <th>
+                            @Html.DisplayNameFor(model => studentSessions.FirstOrDefault().Student.Birthdate)
+                        </th>
+                        <th>
+                            @Html.DisplayNameFor(model => studentSessions.FirstOrDefault().Student.PhoneNumber)
+                        </th>
+                        <th>
+                            @Html.DisplayNameFor(model => studentSessions.FirstOrDefault().Student.Department)
+                        </th>
+                        <th>
+                            @Html.DisplayNameFor(model => studentSessions.FirstOrDefault().Student.Grade)
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in studentSessions)
+                    {
+                        <tr>
+                            <td>
+                                <img src="@string.Format("/Images/Students/{0}/{1}", item.Student.Code , item.Student.ProfileImageUrl)" width="40" />
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.Student.Code)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.Student.Firstname)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.Student.Lastname)
+                            </td>
+                            <td>
+                                @{
+                                    var endDate = item.Student.Birthdate.ToShortDateString();
+                                }
+                                @Html.DisplayFor(modelItem => endDate)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.Student.PhoneNumber)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.Student.Department.Name)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.Student.Grade.Name)
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+
+@section Scripts {
+<script src="~/js/qrcode.min.js" asp-append-version="true"></script>
+<script type="text/javascript">
+        $(document).ready(function() {
+            if (location.hash !== '') $('a[data-bs-target="' + location.hash + '"]').tab('show');
+
+            $('a[data-bs-toggle="tab"]').on('shown.bs.tab', function(e) {
+                debugger;
+               if(history.pushState) {
+                    history.pushState(null, null, '#'+$(e.target).attr('data-bs-target').substr(1));
+               } else {
+                    location.hash = '#'+$(e.target).attr('data-bs-target').substr(1);
+               }
+            });
+        });
+
+        var qrCode;
+        function generateQrCode(initialize)
+        {
+            var dt = new Date();
+            dt.setSeconds(dt.getSeconds() + 10);
+            dt.tos
+            b64 = btoa(encodeURIComponent(`${Math.random()}_${$('input#codeInput').val()}_${dt.toISOString()}`));
+            if(initialize) {
+               qrCode =  new QRCode(document.getElementById("qrcode"), `${(new URL(location.toLocaleString())).origin}/Student/Camera?code=${b64}`);
+            } else {
+                qrCode.clear();
+                qrCode.makeCode(`${(new URL(location.toLocaleString())).origin}/Student/Camera?code=${b64}`);
+            }
+        }
+        setInterval(()=> { generateQrCode(false); }, 10000);
+        generateQrCode(true);
+</script>
+}

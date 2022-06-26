@@ -1,0 +1,46 @@
+﻿@{
+    ViewData["Title"] = "Camera";
+    Layout = "~/Views/Shared/_StudentLayout.cshtml";
+}
+
+<h1>Camera</h1>
+
+<form id='cameraFrom' action="Snapshot" method="post">
+    <div class="d-flex flex-column min-vh-50 justify-content-center align-items-center">
+        <div class="card text-center">
+            <div class="card-header">
+                Capture an image with clear face
+            </div>
+            <div class="card-body">
+                <div id="my_camera"></div>
+                <input type="hidden" name="image" id="inputImage" />
+                <input type="hidden" name="code" value="@ViewBag.Code" />
+                <input type="hidden" name="encoded" value="@ViewBag.Encoded" />
+            </div>
+            <div class="card-footer">
+                <button type="button" class="btn btn-primary" id='btnCapture'>Capture</button>
+            </div>
+        </div>
+    </div>
+</form>
+
+@section Scripts {
+<script src="~/js/webcam.min.js" asp-append-version="true"></script>
+<script language="JavaScript">
+    Webcam.set({
+        width: 320,
+       height: 240,
+       image_format: 'jpeg',
+       jpeg_quality: 90
+    });
+    Webcam.attach( '#my_camera' );
+
+    document.getElementById("btnCapture").addEventListener('click',()=>{
+        Webcam.snap( function(data_uri) {
+
+            $('#inputImage').val(data_uri);
+            $('form#cameraFrom').submit();
+        });
+    });
+</script>
+}

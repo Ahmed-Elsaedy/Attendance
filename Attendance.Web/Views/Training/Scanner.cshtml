@@ -1,0 +1,28 @@
+﻿@{
+    ViewData["Title"] = "Face Recognition";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h1>Face Recognition</h1>
+
+<h4>Student</h4>
+<hr />
+
+<form asp-action="Scanner" enctype="multipart/form-data">
+    <div class="row">
+        <div class="col">
+            <div class="form-group">
+                <label class="form-label">Image</label>
+                <input name='file' class="form-control form-control-sm" type="file" readonly>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col">
+            <div class="form-group">
+                <input type="submit" value="Recognize" class="btn btn-primary" />
+            </div>
+        </div>
+    </div>
+</form>
+
