@@ -6,10 +6,10 @@ namespace Attendance.Web.DTOs.Sessions
     {
         public CreateSessionDto()
         {
-            Date = DateTime.Now;
-            TimeFrom = new DateTime(Date.Year, Date.Month, Date.Day, Date.Hour, Date.Minute, 0);
-            TimeTo = new DateTime(Date.Year, Date.Month, Date.Day, Date.Hour + 2, Date.Minute, 0);
-            Date = Date.Date;
+            Date = DateTime.Now.Date;
+            //TimeFrom = new DateTime(Date.Year, Date.Month, Date.Day, Date.Hour, Date.Minute, 0);
+            //TimeTo = new DateTime(Date.Year, Date.Month, Date.Day, Date.Hour + 2, Date.Minute, 0);
+            //Date = Date.Date;
         }
 
         [Required]
