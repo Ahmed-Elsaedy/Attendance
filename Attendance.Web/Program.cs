@@ -4,6 +4,7 @@ using Attendance.Web.Data;
 using Microsoft.Extensions.FileProviders;
 using Attendance.Web.Controllers;
 using Attendance.Web.Data.Entities;
+using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
 //var connectionString = builder.Configuration.GetConnectionString("ApplicationDbContextConnection") ?? throw new InvalidOperationException("Connection string 'ApplicationDbContextConnection' not found.");
@@ -29,7 +30,14 @@ builder.Services
     .AddRoles<IdentityRole>()
     .AddEntityFrameworkStores<ApplicationDbContext>();
 
+
 builder.Services.AddControllersWithViews();
+
+builder.Host.ConfigureLogging((ctx, b) =>
+ {
+     b.AddConfiguration(ctx.Configuration.GetSection("Logging"));
+     b.AddFile("Test");
+ });
 
 var app = builder.Build();
 

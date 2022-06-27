@@ -13,15 +13,17 @@ namespace Attendance.Web.Controllers
     {
         private readonly ApplicationDbContext _context;
         private readonly IWebHostEnvironment _webHostEnvironment;
+        private readonly ILogger<StudentController> _logger;
 
         static string personGroupId = "951f5c978aec4fca89f5b25f5d9a57d8";
         const string SUBSCRIPTION_KEY = "951f5c978aec4fca89f5b25f5d9a57d8";
         const string ENDPOINT = "https://attendanceaifaceservice.cognitiveservices.azure.com/";
 
-        public StudentController(ApplicationDbContext context, IWebHostEnvironment webHostEnvironment)
+        public StudentController(ApplicationDbContext context, IWebHostEnvironment webHostEnvironment, ILogger<StudentController> logger)
         {
             _context = context;
             _webHostEnvironment = webHostEnvironment;
+            _logger = logger;
         }
 
         public IActionResult Camera([FromQuery] string code)
@@ -34,7 +36,8 @@ namespace Attendance.Web.Controllers
             if (data.Length != 3)
                 return RedirectToAction(nameof(Error), new { error = SessionAttendanceCodeValidationEnum.InvalidCode });
 
-            DateTime dateTime = DateTime.Parse(data[2], null, System.Globalization.DateTimeStyles.RoundtripKind);
+            DateTime dateTime = DateTime.Parse(data[2], null, System.Globalization.DateTimeStyles.AdjustToUniversal);
+            _logger.LogInformation($"QR Date: {dateTime} | UtcNow: {DateTime.UtcNow}");
             if (DateTime.UtcNow > dateTime)
                 return RedirectToAction(nameof(Error), new { error = SessionAttendanceCodeValidationEnum.ExpiredCode });
 
@@ -90,8 +93,11 @@ namespace Attendance.Web.Controllers
                     var faceNames = new Dictionary<Guid, string>();
                     foreach (var face in recognizedFaces)
                     {
-                        var person = await faceClient.PersonGroupPerson.GetAsync(personGroupId, face.Candidates[0].PersonId);
-                        faceNames.Add(face.FaceId, person.Name);
+                        if (face.Candidates.Count > 0)
+                        {
+                            var person = await faceClient.PersonGroupPerson.GetAsync(personGroupId, face.Candidates[0].PersonId);
+                            faceNames.Add(face.FaceId, person.Name);
+                        }
                     }
                     if (faceNames.Count == 0)
                         return RedirectToAction(nameof(Error), new { error = SessionAttendanceCodeValidationEnum.UnRecognizedPerson });

@@ -198,6 +198,9 @@ namespace Attendance.Web.Controllers
 
             await _context.SaveChangesAsync();
             await DeleteStudentPersonGroupPerson(student);
+            
+            string studentFolder = Path.Combine(_webHostEnvironment.WebRootPath, "Images", "Students", student.Code);
+            if (Directory.Exists(studentFolder)) Directory.Delete(studentFolder, true);
 
             return RedirectToAction(nameof(StudentsList));
         }
@@ -285,7 +288,11 @@ namespace Attendance.Web.Controllers
         {
             var faceClient = new FaceClient(new ApiKeyServiceClientCredentials(SUBSCRIPTION_KEY)) { Endpoint = ENDPOINT };
             if (student.PersonId.HasValue)
-                await faceClient.PersonGroupPerson.DeleteAsync(personGroupId, student.PersonId.Value);
+            {
+                var groupPerson = await faceClient.PersonGroupPerson.GetAsync(personGroupId, student.PersonId.Value);
+                if (groupPerson != null)
+                    await faceClient.PersonGroupPerson.DeleteAsync(personGroupId, student.PersonId.Value);
+            }
 
             await TrainStudentsRecognitionModel();
         }

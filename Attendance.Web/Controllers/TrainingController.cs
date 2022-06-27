@@ -22,6 +22,22 @@ namespace Attendance.Web.Controllers
             _webHostEnvironment = webHostEnvironment;
         }
 
+        [HttpGet]
+        public async Task<IActionResult> Reset()
+        {
+            var faceClient = new FaceClient(new ApiKeyServiceClientCredentials(SUBSCRIPTION_KEY)) { Endpoint = ENDPOINT };
+
+            // Delete group if it already exists
+            var groups = await faceClient.PersonGroup.ListAsync();
+            foreach (var group in groups)
+                await faceClient.PersonGroup.DeleteAsync(group.PersonGroupId);
+
+            // Create person group
+            await faceClient.PersonGroup.CreateAsync(personGroupId, personGroupName);
+
+            return Ok();
+        }
+
         public async Task<IActionResult> Index()
         {
             // Authenticate Face client
