@@ -161,7 +161,7 @@
         function generateQrCode(initialize)
         {
             var dt = new Date();
-            dt.setSeconds(dt.getSeconds() + 10);
+            dt.setSeconds(dt.getSeconds() + 20);
             dt.tos
             b64 = btoa(encodeURIComponent(`${Math.random()}_${$('input#codeInput').val()}_${dt.toISOString()}`));
             if(initialize) {
