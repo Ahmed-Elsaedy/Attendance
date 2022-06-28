@@ -286,12 +286,18 @@ namespace Attendance.Web.Controllers
         }
         private async Task DeleteStudentPersonGroupPerson(Student student)
         {
-            var faceClient = new FaceClient(new ApiKeyServiceClientCredentials(SUBSCRIPTION_KEY)) { Endpoint = ENDPOINT };
-            if (student.PersonId.HasValue)
+            try
             {
-                var groupPerson = await faceClient.PersonGroupPerson.GetAsync(personGroupId, student.PersonId.Value);
-                if (groupPerson != null)
-                    await faceClient.PersonGroupPerson.DeleteAsync(personGroupId, student.PersonId.Value);
+                var faceClient = new FaceClient(new ApiKeyServiceClientCredentials(SUBSCRIPTION_KEY)) { Endpoint = ENDPOINT };
+                if (student.PersonId.HasValue)
+                {
+                    var groupPerson = await faceClient.PersonGroupPerson.GetAsync(personGroupId, student.PersonId.Value);
+                    if (groupPerson != null)
+                        await faceClient.PersonGroupPerson.DeleteAsync(personGroupId, student.PersonId.Value);
+                }
+            }
+            catch (APIErrorException ex)
+            {
             }
 
             await TrainStudentsRecognitionModel();
