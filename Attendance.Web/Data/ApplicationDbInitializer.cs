@@ -1,16 +1,20 @@
 ﻿using Attendance.Web.Data.Entities;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 
 namespace Attendance.Web.Data
 {
     public static class ApplicationDbInitializer
     {
-        public static void SeedData(IHost host)
+        public static async void SeedData(IHost host)
         {
             using (var scope = host.Services.CreateScope())
             {
                 var services = scope.ServiceProvider;
                 var context = services.GetRequiredService<ApplicationDbContext>();
+                //await context.Database.EnsureCreatedAsync();
+                await context.Database.MigrateAsync();
+                
                 var userManager = services.GetRequiredService<UserManager<ApplicationUser>>();
                 var roleManager = services.GetRequiredService<RoleManager<IdentityRole>>();
                 SeedRoles(roleManager);
