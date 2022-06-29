@@ -349,3 +349,7 @@ MigrationBackup/
 # Ionide (cross platform F# VS Code tools) working folder
 .ionide/
 /Attendance.Web/Test-20220628
+/Attendance.Web/app.db-wal
+/Attendance.Web/app.db-shm
+/Attendance.Web/app.db
+/Attendance.Web/Test-20220629

@@ -67,6 +67,7 @@ namespace Attendance.Web.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [RequestSizeLimit(2097152)]
         public async Task<IActionResult> CreateStudent(CreateStudentDto student)
         {
             if (ModelState.IsValid)
@@ -132,6 +133,7 @@ namespace Attendance.Web.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [RequestSizeLimit(2097152)]
         public async Task<IActionResult> EditStudent(int id, EditStudentDto student)
         {
             var dbStudent = _context.Student.Find(id);
@@ -198,7 +200,7 @@ namespace Attendance.Web.Controllers
 
             await _context.SaveChangesAsync();
             await DeleteStudentPersonGroupPerson(student);
-            
+
             string studentFolder = Path.Combine(_webHostEnvironment.WebRootPath, "Images", "Students", student.Code);
             if (Directory.Exists(studentFolder)) Directory.Delete(studentFolder, true);
 
@@ -310,6 +312,65 @@ namespace Attendance.Web.Controllers
         private bool StudentExists(int id)
         {
             return _context.Student.Any(e => e.Id == id);
+        }
+
+        [HttpGet]
+        public IActionResult ModelTraining()
+        {
+            return View();
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> ResetModelTraining()
+        {
+
+            var faceClient = new FaceClient(new ApiKeyServiceClientCredentials(SUBSCRIPTION_KEY)) { Endpoint = ENDPOINT };
+
+            // Delete group if it already exists
+            var groups = await faceClient.PersonGroup.ListAsync();
+            foreach (var group in groups)
+                await faceClient.PersonGroup.DeleteAsync(group.PersonGroupId);
+
+            // Create person group
+            await faceClient.PersonGroup.CreateAsync(personGroupId, personGroupName);
+
+            // Get all students
+            var allStudents = _context.Student.ToList();
+            foreach (var student in allStudents)
+            {
+                await Task.Delay(250);
+
+                // Create new group person
+                var person = await faceClient.PersonGroupPerson.CreateAsync(personGroupId, student.Code, userData: student.ProfileImageUrl);
+                student.PersonId = person.PersonId;
+                _context.Student.Update(student);
+
+                // Add face for group person
+                var studentImagesPaths = Directory.EnumerateFiles(Path.Combine(_webHostEnvironment.WebRootPath, "Images", "Students", student.Code));
+                foreach (var imagePath in studentImagesPaths)
+                {
+                    using var imageData = System.IO.File.OpenRead(imagePath);
+                    await faceClient.PersonGroupPerson.AddFaceFromStreamAsync(personGroupId, person.PersonId, imageData);
+                }
+            }
+            _context.SaveChanges();
+
+            // Train the model
+            await faceClient.PersonGroup.TrainAsync(personGroupId);
+
+            // Wait for training to complete
+            while (true)
+            {
+                await Task.Delay(1000);
+                var trainingStatus = await faceClient.PersonGroup.GetTrainingStatusAsync(personGroupId);
+                if (trainingStatus.Status == TrainingStatusType.Succeeded || trainingStatus.Status == TrainingStatusType.Failed)
+                { break; }
+            }
+
+            //var people = await faceClient.PersonGroupPerson.ListAsync(personGroupId);
+            //return people;
+
+            return Json(true);
         }
     }
 }

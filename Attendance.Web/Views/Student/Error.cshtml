@@ -2,10 +2,10 @@
 @model SessionAttendanceCodeValidationEnum
 
 @{
-    ViewData["Title"] = "Error";
+    Boolean isError = false;
+    ViewData["Title"] = isError ? "Error" : "Success";
 
     Layout = "~/Views/Shared/_StudentLayout.cshtml";
-    Boolean isError = false;
     string message = "";
     switch (Model)
     {
